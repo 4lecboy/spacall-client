@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Button, Text, Alert, ActivityIndicator, Keyboard } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  Button,
+  Text,
+  Alert,
+  ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { supabase } from '../lib/supabase';
+import { COLORS, SIZES, FONTS, SHADOW } from '../constants/theme';
 
 export default function Auth() {
   const [email, setEmail] = useState('');
@@ -9,6 +22,7 @@ export default function Auth() {
 
   // Function to Login
   async function signInWithEmail() {
+    Keyboard.dismiss();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
@@ -60,72 +74,114 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Spacall</Text>
-      
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={true}
-          autoCapitalize="none"
-          value={password}
-          onChangeText={setPassword}
-        />
-      </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.container}>
+          <Text style={styles.header}>Spacall</Text>
 
-      <View style={styles.buttonContainer}>
-        {loading ? (
-          <ActivityIndicator color="#0000ff" />
-        ) : (
-          <>
-            <Button title="Sign In" onPress={signInWithEmail} />
-            <View style={styles.spacer} />
-            <Button title="Create Account" color="#841584" onPress={signUpWithEmail} />
-          </>
-        )}
-      </View>
-    </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              returnKeyType="next"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={true}
+              autoCapitalize="none"
+              value={password}
+              onChangeText={setPassword}
+              returnKeyType="done"
+              onSubmitEditing={signInWithEmail}
+            />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            {loading ? (
+              <ActivityIndicator color="#0000ff" />
+            ) : (
+              <>
+                <Button title="Sign In" onPress={signInWithEmail} />
+                <View style={styles.spacer} />
+                <Button title="Create Account" color="#841584" onPress={signUpWithEmail} />
+              </>
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
+// Replace the styles object in Auth.tsx with this:
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: SIZES.padding,
+    backgroundColor: COLORS.background, // Warm cream background
   },
   header: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    ...FONTS.heading, // Applies serif bold font
+    fontSize: 36,
     marginBottom: 40,
     textAlign: 'center',
-    color: '#333',
+    color: COLORS.primary, // Gold color for the main title
   },
   inputContainer: {
     marginBottom: 20,
   },
   input: {
-    height: 50,
-    borderColor: '#ccc',
+    height: 55,
+    backgroundColor: COLORS.white,
+    borderColor: '#E0E0E0',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: SIZES.radius,
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
+    color: COLORS.textMain,
   },
   buttonContainer: {
     marginTop: 10,
+    gap: 15, // Adds space between buttons
+  },
+  // REPLACING STANDARD BUTTONS WITH CUSTOM STYLED ONES:
+  primaryButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 15,
+    borderRadius: SIZES.radius,
+    alignItems: 'center',
+    ...SHADOW,
+  },
+  primaryButtonText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  secondaryButton: {
+    backgroundColor: COLORS.white,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    paddingVertical: 15,
+    borderRadius: SIZES.radius,
+    alignItems: 'center',
+  },
+  secondaryButtonText: {
+    color: COLORS.primary,
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   spacer: {
     height: 10,
   },
 });
+

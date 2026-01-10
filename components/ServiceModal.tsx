@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
+import { COLORS, SIZES, FONTS, SHADOW } from '../constants/theme';
 
 // Hardcoded services for the prototype
 const SERVICES = [
@@ -109,15 +110,15 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    height: '50%',
+    backgroundColor: COLORS.background, // Cream background
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    padding: SIZES.padding,
+    height: '55%',
+    ...SHADOW,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    ...FONTS.heading,
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -125,19 +126,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
+    padding: 18,
+    backgroundColor: COLORS.white, // White cards on cream background
+    borderRadius: SIZES.radius,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: '#eee',
-    borderRadius: 10,
-    marginBottom: 10,
   },
   selectedItem: {
-    borderColor: '#841584',
-    backgroundColor: '#fdf0fd',
+    borderColor: COLORS.primary,
+    backgroundColor: '#FAF6EE', // A very light gold tint
   },
-  serviceName: { fontSize: 16, fontWeight: '600' },
-  serviceDuration: { fontSize: 12, color: '#666' },
-  servicePrice: { fontSize: 16, fontWeight: 'bold', color: '#841584' },
+  serviceName: { 
+     fontSize: 16, 
+     fontWeight: '600', 
+     color: COLORS.textMain 
+  },
+  serviceDuration: { 
+     ...FONTS.body, 
+     fontSize: 14 
+  },
+  servicePrice: { 
+     fontSize: 18, 
+     fontWeight: 'bold', 
+     color: COLORS.primary // Gold price
+  },
   
   buttonRow: { flexDirection: 'row', marginTop: 20, gap: 10 },
   cancelButton: { flex: 1, padding: 15, alignItems: 'center' },
