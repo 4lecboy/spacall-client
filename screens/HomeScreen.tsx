@@ -59,6 +59,8 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
     let activeChannel: any = null;
 
     async function initialize() {
+      // Load services data for the list
+      await loadData();
       // 1. Get Session
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
