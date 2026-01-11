@@ -39,39 +39,39 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ services, onPress }
         };
 
         return (
-        <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => onPress(item)}
-            style={{ width: CARD_WIDTH, paddingHorizontal: 8 }}
-        >
-            <View
-                style={{
-                    backgroundColor: COLORS.white,
-                    borderRadius: SIZES.radius,
-                    overflow: 'hidden',
-                    ...SHADOWS.medium,
-                }}
+            <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => onPress(item)}
+                style={{ width: CARD_WIDTH, paddingHorizontal: 8 }}
             >
-                {source ? (
-                    <Image
-                        source={source}
-                        style={{ width: '100%', height: 160 }}
-                        resizeMode="cover"
-                        onError={handleError}
-                    />
-                ) : (
-                    <View style={{ width: '100%', height: 160, backgroundColor: COLORS.goldLight }} />
-                )}
+                <View
+                    style={{
+                        backgroundColor: COLORS.white,
+                        borderRadius: SIZES.radius,
+                        overflow: 'hidden',
+                        ...SHADOWS.medium,
+                    }}
+                >
+                    {source ? (
+                        <Image
+                            source={source}
+                            style={{ width: '100%', height: 160 }}
+                            resizeMode="cover"
+                            onError={handleError}
+                        />
+                    ) : (
+                        <View style={{ width: '100%', height: 160, backgroundColor: COLORS.goldLight }} />
+                    )}
 
-                <View style={{ padding: 12 }}>
-                    <CustomText variant="h3">{item.name}</CustomText>
-                    <CustomText variant="caption">{item.duration_min} mins • {item.category}</CustomText>
-                    <CustomText variant="body" color={COLORS.primary} style={{ marginTop: 8 }}>
-                        ₱{item.price}
-                    </CustomText>
+                    <View style={{ padding: 12 }}>
+                        <CustomText variant="h3">{item.name}</CustomText>
+                        <CustomText variant="caption">{item.duration_min} mins • {item.category}</CustomText>
+                        <CustomText variant="body" color={COLORS.primary} style={{ marginTop: 8 }}>
+                            ₱{item.price}
+                        </CustomText>
+                    </View>
                 </View>
-            </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
         );
     };
 

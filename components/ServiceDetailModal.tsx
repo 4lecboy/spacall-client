@@ -36,7 +36,7 @@ export default function ServiceDetailModal({ visible, service, onClose, onBook }
       <View style={styles.container}>
         {/* Grey Handle Bar (Visual cue to swipe down) */}
         <View style={styles.handleContainer}>
-            <View style={styles.handle} />
+          <View style={styles.handle} />
         </View>
 
         {/* 3. Image Header (Placeholder logic for now) */}
@@ -56,11 +56,11 @@ export default function ServiceDetailModal({ visible, service, onClose, onBook }
         {/* 4. Text Content */}
         <ScrollView style={styles.content}>
           <View style={styles.headerRow}>
-             <View style={{flex: 1}}>
-                <CustomText variant="h2">{service.name}</CustomText>
-                <CustomText variant="caption">{service.category} • {service.duration_min} mins</CustomText>
-             </View>
-             <CustomText variant="h2" color={COLORS.primary}>₱{service.price}</CustomText>
+            <View style={{ flex: 1 }}>
+              <CustomText variant="h2">{service.name}</CustomText>
+              <CustomText variant="caption">{service.category} • {service.duration_min} mins</CustomText>
+            </View>
+            <CustomText variant="h2" color={COLORS.primary}>₱{service.price}</CustomText>
           </View>
 
           <View style={styles.divider} />
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   handleContainer: { alignItems: 'center', paddingVertical: 15 },
   handle: { width: 50, height: 5, backgroundColor: '#E0E0E0', borderRadius: 5 },
-  
+
   imageContainer: {
     height: 200,
     marginHorizontal: SIZES.padding,
@@ -106,11 +106,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: { width: '100%', height: '100%' },
-  
+
   content: { paddingHorizontal: SIZES.padding },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 },
   divider: { height: 1, backgroundColor: COLORS.border, marginBottom: 20 },
-  
+
   footer: {
     padding: SIZES.padding,
     borderTopWidth: 1,
