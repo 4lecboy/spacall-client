@@ -4,6 +4,7 @@ import { Service } from '../types';
 /**
  * FETCH SERVICES
  * Returns the list of active services from the database.
+ * Maps is_featured from DB to featured in TypeScript interface.
  * Used in: Home Screen (Guest Mode)
  */
 export async function fetchServices(): Promise<Service[]> {
@@ -18,7 +19,11 @@ export async function fetchServices(): Promise<Service[]> {
     throw new Error(error.message);
   }
 
-  return data as Service[];
+  // Map is_featured from DB to featured in TypeScript
+  return (data || []).map((service: any) => ({
+    ...service,
+    featured: service.is_featured ?? false,
+  })) as Service[];
 }
 
 /**

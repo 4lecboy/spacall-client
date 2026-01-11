@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../spacall-therapist"
+		},
+		{
+			"path": "../spacall-admin"
+		}
+	],
+	"settings": {}
+}

@@ -6,6 +6,8 @@ export interface Service {
   duration_min: number;
   category: 'Classic' | 'Therapeutic' | 'Premium' | 'Add-on';
   image_url: string | null;
+  // Mark top/best/featured services with this flag. Use `featured` for clarity.
+  featured?: boolean;
 }
 
 export interface UserProfile {

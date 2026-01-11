@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Modal, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { BlurView } from 'expo-blur'; // optional polish, standard view works too
 import CustomText from './CustomText';
 import { COLORS, SIZES, SHADOWS } from '../constants/theme';
 import { Service } from '../types';
+import { getServiceImage } from '../constants/serviceImages';
 
 interface Props {
   visible: boolean;
@@ -14,6 +15,17 @@ interface Props {
 
 export default function ServiceDetailModal({ visible, service, onClose, onBook }: Props) {
   if (!service) return null;
+
+  const [useLocalFallback, setUseLocalFallback] = useState(false);
+  const local = getServiceImage(service);
+  const shouldUseRemote = !!service.image_url && !useLocalFallback;
+  const source = shouldUseRemote ? { uri: service.image_url as string } : local;
+
+  const handleImageError = () => {
+    if (!useLocalFallback && local) {
+      setUseLocalFallback(true);
+    }
+  };
 
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
@@ -29,11 +41,16 @@ export default function ServiceDetailModal({ visible, service, onClose, onBook }
 
         {/* 3. Image Header (Placeholder logic for now) */}
         <View style={styles.imageContainer}>
-          <Image 
-            source={{ uri: service.image_url || 'https://via.placeholder.com/400x300' }} 
-            style={styles.image}
-            resizeMode="cover"
-          />
+          {source ? (
+            <Image
+              source={source}
+              style={styles.image}
+              resizeMode="cover"
+              onError={handleImageError}
+            />
+          ) : (
+            <View style={[styles.image, { backgroundColor: COLORS.goldLight }]} />
+          )}
         </View>
 
         {/* 4. Text Content */}
