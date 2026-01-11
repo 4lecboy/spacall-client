@@ -11,6 +11,7 @@ interface ServicesGridProps {
     error?: Error | null;
     onServicePress: (service: Service) => void;
     onRefresh?: () => void;
+    listHeaderComponent?: React.ReactElement | null;
 }
 
 /**
@@ -23,6 +24,7 @@ const ServicesGrid: React.FC<ServicesGridProps> = ({
     error = null,
     onServicePress,
     onRefresh,
+    listHeaderComponent = null,
 }) => {
     const renderItem = ({ item }: { item: Service }) => (
         <ServiceCard service={item} onPress={onServicePress} />
@@ -30,44 +32,44 @@ const ServicesGrid: React.FC<ServicesGridProps> = ({
 
     const keyExtractor = (item: Service) => item.id;
 
-    if (loading && services.length === 0) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color={COLORS.primary} />
-                <CustomText variant="body" style={{ marginTop: 12 }}>
-                    Loading services...
-                </CustomText>
-            </View>
-        );
-    }
+    const renderEmpty = () => {
+        if (loading) {
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
+                    <ActivityIndicator size="large" color={COLORS.primary} />
+                    <CustomText variant="body" style={{ marginTop: 12 }}>
+                        Loading services...
+                    </CustomText>
+                </View>
+            );
+        }
 
-    if (error && services.length === 0) {
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <CustomText variant="body" color={COLORS.danger}>
-                    Error loading services
-                </CustomText>
-                {onRefresh && (
-                    <TouchableOpacity
-                        onPress={onRefresh}
-                        style={{ marginTop: 12, padding: 8 }}
-                    >
-                        <CustomText variant="h3" color={COLORS.primary}>
-                            Retry
-                        </CustomText>
-                    </TouchableOpacity>
-                )}
-            </View>
-        );
-    }
+        if (error) {
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
+                    <CustomText variant="body" color={COLORS.danger}>
+                        Error loading services
+                    </CustomText>
+                    {onRefresh && (
+                        <TouchableOpacity
+                            onPress={onRefresh}
+                            style={{ marginTop: 12, padding: 8 }}
+                        >
+                            <CustomText variant="h3" color={COLORS.primary}>
+                                Retry
+                            </CustomText>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            );
+        }
 
-    if (services.length === 0) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 40 }}>
                 <CustomText variant="body">No services available</CustomText>
             </View>
         );
-    }
+    };
 
     return (
         <FlatList
@@ -80,6 +82,8 @@ const ServicesGrid: React.FC<ServicesGridProps> = ({
             columnWrapperStyle={{ justifyContent: 'space-between' }}
             refreshing={loading && services.length > 0}
             onRefresh={onRefresh}
+            ListHeaderComponent={listHeaderComponent}
+            ListEmptyComponent={renderEmpty}
         />
     );
 };

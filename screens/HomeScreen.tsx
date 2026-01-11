@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Modal, StyleSheet, Platform } from 'react-native';
 import ScreenWrapper from '../components/ScreenWrapper';
 import CustomText from '../components/CustomText';
-import { COLORS } from '../constants/theme';
+import { COLORS, SIZES } from '../constants/theme';
 import { Service } from '../types';
 import ServiceDetailModal from '../components/ServiceDetailModal';
 import ActiveBookingCard from '../components/ActiveBookingCard';
@@ -27,6 +27,7 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [authModalVisible, setAuthModalVisible] = useState(false);
+  const [bookingDetailsVisible, setBookingDetailsVisible] = useState(false);
 
   // Custom hooks for data fetching and session management
   const { services, loading: servicesLoading, error: servicesError, refetch: refetchServices } = useServices();
@@ -74,6 +75,18 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
     }, 500);
   }, [selectedService, onNavigateToCheckout]);
 
+  const handleTrack = useCallback(() => {
+    alert('Map Tracking coming soon!');
+  }, []);
+
+  const openBookingDetails = useCallback(() => {
+    setBookingDetailsVisible(true);
+  }, []);
+
+  const closeBookingDetails = useCallback(() => {
+    setBookingDetailsVisible(false);
+  }, []);
+
   /**
    * Handle sign out
    */
@@ -83,53 +96,74 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
 
   return (
     <ScreenWrapper>
-      {/* 1. Header & List (Wrap them in a View with flex:1 to push footer down) */}
-      <View style={{ flex: 1 }}>
-        {/* Header */}
-        <View
-          style={{
-            marginVertical: 20,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+      {/* Single scrollable area via FlatList (header + featured + grid) */}
+      <ServicesGrid
+        services={services}
+        loading={servicesLoading}
+        error={servicesError}
+        onServicePress={handleServicePress}
+        onRefresh={refetchServices}
+        listHeaderComponent={(
           <View>
-            <CustomText variant="caption">Good Morning,</CustomText>
-            <CustomText variant="h1">Relaxation awaits.</CustomText>
-          </View>
+            {/* Header */}
+            <View
+              style={{
+                marginVertical: 20,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <View>
+                <CustomText variant="caption">Good Morning,</CustomText>
+                <CustomText variant="h1">Relaxation awaits.</CustomText>
+              </View>
 
-          {session && (
-            <TouchableOpacity onPress={handleSignOut} style={{ padding: 8 }}>
-              <CustomText variant="body" color={COLORS.primary}>
-                Log Out
-              </CustomText>
-            </TouchableOpacity>
-          )}
-        </View>
+              {session && (
+                <TouchableOpacity onPress={handleSignOut} style={{ padding: 8 }}>
+                  <CustomText variant="body" color={COLORS.primary}>
+                    Log Out
+                  </CustomText>
+                </TouchableOpacity>
+              )}
+            </View>
 
-        {/* Active Booking Card */}
-        {activeBooking && (
-          <View style={{ marginBottom: 20 }}>
-            <ActiveBookingCard
-              booking={activeBooking}
-              onTrack={() => alert('Map Tracking coming soon!')}
-            />
+            {/* Featured / Best Services Carousel */}
+            <FeaturedCarousel services={services} onPress={handleServicePress} />
           </View>
         )}
+      />
 
-        {/* Featured / Best Services Carousel */}
-        <FeaturedCarousel services={services} onPress={handleServicePress} />
+      {activeBooking && (
+        <>
+          <View style={styles.stickyBooking}>
+            <ActiveBookingCard
+              booking={activeBooking}
+              mode="compact"
+              onPress={openBookingDetails}
+              onTrack={handleTrack}
+            />
+          </View>
 
-        {/* Services Grid */}
-        <ServicesGrid
-          services={services}
-          loading={servicesLoading}
-          error={servicesError}
-          onServicePress={handleServicePress}
-          onRefresh={refetchServices}
-        />
-      </View>
+          <Modal
+            visible={bookingDetailsVisible}
+            transparent
+            animationType="slide"
+            onRequestClose={closeBookingDetails}
+          >
+            <View style={styles.modalContainer}>
+              <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={closeBookingDetails} />
+              <View style={styles.modalCardWrapper}>
+                <ActiveBookingCard
+                  booking={activeBooking}
+                  onTrack={handleTrack}
+                  onHelp={() => alert('Support coming soon!')}
+                />
+              </View>
+            </View>
+          </Modal>
+        </>
+      )}
 
       {/* 2. Footer Authentication Component */}
       <FooterAuth visible={!session} onLoginPress={() => setAuthModalVisible(true)} />
@@ -150,3 +184,28 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
     </ScreenWrapper>
   );
 }
+
+const styles = StyleSheet.create({
+  stickyBooking: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 80,
+    left: SIZES.padding,
+    right: SIZES.padding,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalCardWrapper: {
+    backgroundColor: 'transparent',
+    paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+  },
+});
