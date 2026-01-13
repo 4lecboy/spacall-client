@@ -4,7 +4,7 @@ const { width, height } = Dimensions.get('window');
 
 export const COLORS = {
   background: '#FAFAF9', // Warm Cream (Main BG)
-  primary: '#C5A059',    // Metallic Gold (Buttons/Actions)
+  primary: '#D4AF37',    // Metallic Gold (Buttons/Actions)
   secondary: '#2B2A29',  // Deep Charcoal (Headings)
   muted: '#5C5B57',      // Warm Grey (Body Text)
   white: '#FFFFFF',

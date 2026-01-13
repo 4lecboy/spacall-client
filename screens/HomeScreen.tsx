@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import { View, TouchableOpacity, Modal, StyleSheet, Platform } from 'react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { View, TouchableOpacity, Modal, StyleSheet, Platform, TextInput, ScrollView } from 'react-native';
 import ScreenWrapper from '../components/ScreenWrapper';
 import CustomText from '../components/CustomText';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, SIZES, SHADOWS } from '../constants/theme';
 import { Service } from '../types';
 import ServiceDetailModal from '../components/ServiceDetailModal';
 import ActiveBookingCard from '../components/ActiveBookingCard';
@@ -11,10 +11,13 @@ import ServiceCard from '../components/ServiceCard';
 import ServicesGrid from '../components/ServicesGrid';
 import FeaturedCarousel from '../components/FeaturedCarousel';
 import FooterAuth from '../components/FooterAuth';
-import { useServices, useAuthSession, useActiveBooking } from '../hooks';
+import { useServices, useActiveBooking } from '../hooks';
+import { Session } from '@supabase/supabase-js';
 
 interface Props {
   onNavigateToCheckout: (service: Service) => void;
+  session: Session | null;
+  onSignOut: () => Promise<void>;
 }
 
 /**
@@ -22,17 +25,30 @@ interface Props {
  * Main landing screen displaying services, active bookings, and authentication
  * Orchestrates hooks and modular components for service browsing and booking
  */
-export default function HomeScreen({ onNavigateToCheckout }: Props) {
+export default function HomeScreen({ onNavigateToCheckout, session, onSignOut }: Props) {
   // State management
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [bookingDetailsVisible, setBookingDetailsVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<'All' | Service['category']>('All');
 
   // Custom hooks for data fetching and session management
   const { services, loading: servicesLoading, error: servicesError, refetch: refetchServices } = useServices();
-  const { session, signOut } = useAuthSession();
   const { activeBooking } = useActiveBooking(session);
+
+  const categories: Array<'All' | Service['category']> = ['All', 'Classic', 'Therapeutic', 'Premium', 'Add-on'];
+
+  const filteredServices = useMemo(() => {
+    return services.filter(s => {
+      const matchesCategory = selectedCategory === 'All' ? true : s.category === selectedCategory;
+      const matchesSearch = searchQuery.trim().length === 0
+        ? true
+        : s.name.toLowerCase().includes(searchQuery.trim().toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [services, selectedCategory, searchQuery]);
 
   /**
    * Handle service card press - open service detail modal
@@ -91,14 +107,14 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
    * Handle sign out
    */
   const handleSignOut = useCallback(async () => {
-    await signOut();
-  }, [signOut]);
+    await onSignOut();
+  }, [onSignOut]);
 
   return (
     <ScreenWrapper>
       {/* Single scrollable area via FlatList (header + featured + grid) */}
       <ServicesGrid
-        services={services}
+        services={filteredServices}
         loading={servicesLoading}
         error={servicesError}
         onServicePress={handleServicePress}
@@ -115,8 +131,8 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
               }}
             >
               <View>
-                <CustomText variant="caption">Good Morning,</CustomText>
-                <CustomText variant="h1">Relaxation awaits.</CustomText>
+                <CustomText variant="h1">Good Morning!</CustomText>
+                <CustomText variant="caption">Spacall App</CustomText>
               </View>
 
               {session && (
@@ -128,8 +144,46 @@ export default function HomeScreen({ onNavigateToCheckout }: Props) {
               )}
             </View>
 
+            {/* Search Bar */}
+            <View style={styles.searchRow}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search..."
+                placeholderTextColor={COLORS.muted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                returnKeyType="search"
+              />
+              <TouchableOpacity style={styles.searchButton} onPress={() => { /* no-op, live search */ }}>
+                <CustomText variant="h3" color={COLORS.white}>🔍</CustomText>
+              </TouchableOpacity>
+            </View>
+
+            {/* Category Tabs */}
+            <View style={{ marginTop: 16 }}>
+              <CustomText variant="h3" style={{ marginBottom: 8 }}>Category</CustomText>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 12 }}>
+                {categories.map(cat => {
+                  const active = selectedCategory === cat;
+                  return (
+                    <TouchableOpacity
+                      key={cat}
+                      onPress={() => setSelectedCategory(cat)}
+                      style={{ marginRight: 16, paddingBottom: 6 }}
+                      activeOpacity={0.7}
+                    >
+                      <CustomText variant="body" color={active ? COLORS.secondary : COLORS.muted}>
+                        {cat}
+                      </CustomText>
+                      <View style={{ height: 3, marginTop: 6, backgroundColor: active ? COLORS.primary : 'transparent', borderRadius: 2 }} />
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
             {/* Featured / Best Services Carousel */}
-            <FeaturedCarousel services={services} onPress={handleServicePress} />
+            <FeaturedCarousel services={filteredServices} onPress={handleServicePress} />
           </View>
         )}
       />
@@ -191,6 +245,29 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === 'ios' ? 100 : 80,
     left: SIZES.padding,
     right: SIZES.padding,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radius,
+    ...SHADOWS.light,
+  },
+  searchInput: {
+    flex: 1,
+    height: 48,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: COLORS.secondary,
+  },
+  searchButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: COLORS.primary,
+    borderTopRightRadius: SIZES.radius,
+    borderBottomRightRadius: SIZES.radius,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   modalContainer: {
     flex: 1,

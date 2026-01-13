@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Modal, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Modal, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import CustomText from './CustomText';
 import { COLORS, SIZES, SHADOWS } from '../constants/theme';
 import { supabase } from '../lib/supabase';
@@ -25,13 +25,13 @@ export default function AuthModal({ visible, onClose, onSuccess }: Props) {
         // SIGN UP FLOW
         const { data: { session }, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        
+
         // Note: The database trigger we added earlier handles the Profile creation automatically!
         if (session) {
-           Alert.alert('Welcome!', 'Account created successfully.');
-           onSuccess();
+          Alert.alert('Welcome!', 'Account created successfully.');
+          onSuccess();
         } else {
-           Alert.alert('Check your email', 'Please verify your email to continue.');
+          Alert.alert('Check your email', 'Please verify your email to continue.');
         }
 
       } else {
@@ -50,54 +50,56 @@ export default function AuthModal({ visible, onClose, onSuccess }: Props) {
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.backdrop}>
-        
+
         {/* Tap background to close */}
-        <TouchableOpacity style={{flex: 1}} onPress={onClose} />
+        <TouchableOpacity style={{ flex: 1 }} onPress={onClose} />
 
-        <View style={styles.container}>
-          <CustomText variant="h2" style={{ textAlign: 'center', marginBottom: 5 }}>
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
-          </CustomText>
-          <CustomText variant="body" style={{ textAlign: 'center', marginBottom: 25, color: COLORS.muted }}>
-            {isSignUp ? 'Sign up to book your relaxation.' : 'Log in to continue your booking.'}
-          </CustomText>
-
-          {/* Inputs */}
-          <TextInput 
-            style={styles.input} 
-            placeholder="Email Address" 
-            autoCapitalize="none" 
-            value={email} 
-            onChangeText={setEmail} 
-            placeholderTextColor="#999"
-          />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Password" 
-            secureTextEntry 
-            value={password} 
-            onChangeText={setPassword}
-            placeholderTextColor="#999" 
-          />
-
-          {/* Main Action Button */}
-          <TouchableOpacity style={styles.primaryBtn} onPress={handleAuth} disabled={loading}>
-            {loading ? (
-              <ActivityIndicator color={COLORS.white} />
-            ) : (
-              <CustomText variant="h3" color={COLORS.white}>
-                {isSignUp ? 'Sign Up & Book' : 'Log In & Book'}
-              </CustomText>
-            )}
-          </TouchableOpacity>
-
-          {/* Toggle Login/Signup */}
-          <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)} style={{ marginTop: 20, alignItems: 'center' }}>
-            <CustomText variant="body" color={COLORS.primary}>
-              {isSignUp ? 'Already have an account? Log In' : 'New here? Create Account'}
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} accessible={false}>
+          <View style={styles.container}>
+            <CustomText variant="h2" style={{ textAlign: 'center', marginBottom: 5 }}>
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
             </CustomText>
-          </TouchableOpacity>
-        </View>
+            <CustomText variant="body" style={{ textAlign: 'center', marginBottom: 25, color: COLORS.muted }}>
+              {isSignUp ? 'Sign up to book your relaxation.' : 'Log in to continue your booking.'}
+            </CustomText>
+
+            {/* Inputs */}
+            <TextInput
+              style={styles.input}
+              placeholder="Email Address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+              placeholderTextColor="#999"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor="#999"
+            />
+
+            {/* Main Action Button */}
+            <TouchableOpacity style={styles.primaryBtn} onPress={handleAuth} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color={COLORS.white} />
+              ) : (
+                <CustomText variant="h3" color={COLORS.white}>
+                  {isSignUp ? 'Sign Up & Book' : 'Log In & Book'}
+                </CustomText>
+              )}
+            </TouchableOpacity>
+
+            {/* Toggle Login/Signup */}
+            <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)} style={{ marginTop: 20, alignItems: 'center' }}>
+              <CustomText variant="body" color={COLORS.primary}>
+                {isSignUp ? 'Already have an account? Log In' : 'New here? Create Account'}
+              </CustomText>
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
 
       </KeyboardAvoidingView>
     </Modal>

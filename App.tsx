@@ -7,20 +7,36 @@ import { COLORS } from './constants/theme';
 
 // Screens
 import HomeScreen from './screens/HomeScreen';
-// We will create this next
 import { Service } from './types';
 import CheckoutScreen from './screens/CheckoutScreen';
+import LoginScreen from './screens/LoginScreen';
+import { useAuthSession } from './hooks';
 
 export type ScreenName = 'HOME' | 'CHECKOUT';
 
 export default function App() {
   const [fontsLoaded] = useFonts({ PlayfairDisplay_700Bold, Lato_400Regular, Lato_700Bold });
-  
+  const { session, loading: authLoading, signOut } = useAuthSession();
+  const [guestMode, setGuestMode] = useState(false);
+
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('HOME');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  if (!fontsLoaded) {
+  const handleSkip = () => setGuestMode(true);
+
+  const handleLoginSuccess = () => {
+    setGuestMode(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setGuestMode(false);
+    setSelectedService(null);
+    setCurrentScreen('HOME');
+  };
+
+  if (!fontsLoaded || authLoading) {
     return (
       <SafeAreaProvider>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background }}>
@@ -30,12 +46,20 @@ export default function App() {
     );
   }
 
+  if (!session && !guestMode) {
+    return (
+      <SafeAreaProvider>
+        <LoginScreen onSkip={handleSkip} onLoginSuccess={handleLoginSuccess} />
+      </SafeAreaProvider>
+    );
+  }
+
   // Simple Router
   if (currentScreen === 'CHECKOUT' && selectedService) {
     return (
       <SafeAreaProvider>
         <CheckoutScreen
-          service={selectedService} 
+          service={selectedService}
           onBack={() => setCurrentScreen('HOME')}
         />
       </SafeAreaProvider>
@@ -44,11 +68,13 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <HomeScreen 
+      <HomeScreen
+        session={session}
+        onSignOut={handleSignOut}
         onNavigateToCheckout={(service) => {
           setSelectedService(service);
           setCurrentScreen('CHECKOUT');
-        }} 
+        }}
       />
     </SafeAreaProvider>
   );
