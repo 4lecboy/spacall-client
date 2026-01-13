@@ -7,7 +7,7 @@ export interface Booking {
     client_id: string;
     service_id: string;
     therapist_id?: string;
-    status: 'PENDING' | 'ACCEPTED' | 'ON_WAY' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+    status: 'PENDING' | 'ACCEPTED' | 'ON_WAY' | 'ARRIVED' | 'IN_SESSION' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
     created_at: string;
     [key: string]: any;
 }
@@ -36,7 +36,7 @@ export const useActiveBooking = (session: Session | null): UseActiveBookingRetur
                 .from('bookings')
                 .select('*')
                 .eq('client_id', userId)
-                .in('status', ['PENDING', 'ACCEPTED', 'ON_WAY'])
+                .in('status', ['PENDING', 'ACCEPTED', 'ON_WAY', 'ARRIVED', 'IN_SESSION'])
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .single();
@@ -76,7 +76,7 @@ export const useActiveBooking = (session: Session | null): UseActiveBookingRetur
                     if (newStatus === 'COMPLETED') {
                         setActiveBooking(null);
                         alert('Massage Completed. Thank you!');
-                    } else if (['PENDING', 'ACCEPTED', 'ON_WAY'].includes(newStatus)) {
+                    } else if (['PENDING', 'ACCEPTED', 'ON_WAY', 'ARRIVED', 'IN_SESSION'].includes(newStatus)) {
                         setActiveBooking((prev) => ({
                             ...(prev as Booking),
                             ...payload.new,

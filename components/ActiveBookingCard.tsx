@@ -15,27 +15,38 @@ interface Props {
 const STATUS_CONFIG: Record<string, { title: string; subtitle: string; color: string }> = {
   PENDING: {
     title: 'Matching your therapist',
-    subtitle: 'Typically under 2 mins based on current demand',
+    subtitle: 'We are finding the best match for you',
     color: COLORS.primary,
   },
   ACCEPTED: {
     title: 'Therapist confirmed',
-    subtitle: 'Getting ready and heading out',
+    subtitle: 'Therapist is preparing and will head out',
     color: COLORS.success,
   },
   ON_WAY: {
     title: 'On the way',
-    subtitle: 'We will notify you when nearby',
+    subtitle: 'Therapist is en route to your location',
     color: COLORS.success,
   },
-  IN_PROGRESS: {
-    title: 'Session in progress',
-    subtitle: 'Hope you are feeling relaxed already',
+  ARRIVED: {
+    title: 'Therapist arrived',
+    subtitle: 'Therapist has arrived at your location',
     color: COLORS.secondary,
+  },
+  IN_SESSION: {
+    title: 'Session in progress',
+    subtitle: 'Enjoy your session — we will notify you when complete',
+    color: COLORS.secondary,
+  },
+  COMPLETED: {
+    title: 'Completed',
+    subtitle: 'Thank you — session finished',
+    color: COLORS.muted,
   },
 };
 
-const PROGRESS_STEPS = ['PENDING', 'ACCEPTED', 'ON_WAY', 'IN_PROGRESS', 'COMPLETED'];
+// Order of steps for the progress indicator. Include legacy ON_WAY to remain compatible.
+const PROGRESS_STEPS = ['PENDING', 'ACCEPTED', 'ON_WAY', 'ARRIVED', 'IN_SESSION', 'COMPLETED'];
 
 export default function ActiveBookingCard({ booking, onTrack, onHelp, onPress, mode = 'full', style }: Props) {
   if (!booking) return null;
@@ -43,10 +54,10 @@ export default function ActiveBookingCard({ booking, onTrack, onHelp, onPress, m
   const status = booking.status || 'PENDING';
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.PENDING;
   const activeIndex = Math.max(PROGRESS_STEPS.indexOf(status), 0);
-  const canTrack = ['ACCEPTED', 'ON_WAY', 'IN_PROGRESS'].includes(status);
+  const canTrack = ['ACCEPTED', 'ON_WAY', 'ARRIVED'].includes(status);
 
-  const serviceName = booking.service_type || 'Massage service';
-  const therapistName = booking.therapist_name || 'Assigned soon';
+  const serviceName = booking.service_type || booking.service_name || 'Massage service';
+  const therapistName = booking.therapist_name || booking.therapist || 'Assigned soon';
   const paymentMethod = booking.payment_method || 'On-site payment';
 
   if (mode === 'compact') {
@@ -129,7 +140,7 @@ export default function ActiveBookingCard({ booking, onTrack, onHelp, onPress, m
       </View>
 
       <View style={styles.detailGrid}>
-        <View style={[styles.detailCell, styles.detailCellRight] }>
+        <View style={[styles.detailCell, styles.detailCellRight]}>
           <CustomText variant="caption" color={COLORS.muted}>
             Service
           </CustomText>
@@ -141,7 +152,7 @@ export default function ActiveBookingCard({ booking, onTrack, onHelp, onPress, m
           </CustomText>
           <CustomText variant="body">{therapistName}</CustomText>
         </View>
-        <View style={[styles.detailCell, styles.detailCellRight] }>
+        <View style={[styles.detailCell, styles.detailCellRight]}>
           <CustomText variant="caption" color={COLORS.muted}>
             Payment
           </CustomText>
