@@ -21,11 +21,6 @@ const ServiceCard: React.FC<ServiceCardProps> = React.memo(({ service, onPress }
         onPress(service);
     };
 
-    // DEBUG: Log image lookup for troubleshooting
-    if (__DEV__) {
-        console.log(`[${service.name}] id=${service.id}, remote=${!!service.image_url}, local=${!!getServiceImage(service)}`);
-    }
-
     return (
         <TouchableOpacity
             activeOpacity={0.8}

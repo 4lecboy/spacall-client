@@ -8,6 +8,9 @@ export interface Booking {
     service_id: string;
     therapist_id?: string;
     status: 'PENDING' | 'ACCEPTED' | 'ON_WAY' | 'ARRIVED' | 'IN_SESSION' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+    therapist_latitude?: number;
+    therapist_longitude?: number;
+    therapist_location_updated_at?: string;
     created_at: string;
     [key: string]: any;
 }
@@ -57,7 +60,6 @@ export const useActiveBooking = (session: Session | null): UseActiveBookingRetur
     }, []);
 
     const subscribeToBookingUpdates = useCallback((userId: string) => {
-        console.log('🔌 Subscribing to booking updates for user:', userId);
 
         const channel = supabase
             .channel(`booking_updates_${userId}`)

@@ -6,6 +6,7 @@ import { COLORS, SIZES, SHADOWS } from '../constants/theme';
 import { Service } from '../types';
 import ServiceDetailModal from '../components/ServiceDetailModal';
 import ActiveBookingCard from '../components/ActiveBookingCard';
+import TrackTherapistModal from '../components/TrackTherapistModal';
 import AuthModal from '../components/AuthModal';
 import ServiceCard from '../components/ServiceCard';
 import ServicesGrid from '../components/ServicesGrid';
@@ -31,6 +32,7 @@ export default function HomeScreen({ onNavigateToCheckout, session, onSignOut }:
   const [modalVisible, setModalVisible] = useState(false);
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [bookingDetailsVisible, setBookingDetailsVisible] = useState(false);
+  const [trackModalVisible, setTrackModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'All' | Service['category']>('All');
 
@@ -92,7 +94,7 @@ export default function HomeScreen({ onNavigateToCheckout, session, onSignOut }:
   }, [selectedService, onNavigateToCheckout]);
 
   const handleTrack = useCallback(() => {
-    alert('Map Tracking coming soon!');
+    setTrackModalVisible(true);
   }, []);
 
   const openBookingDetails = useCallback(() => {
@@ -235,6 +237,15 @@ export default function HomeScreen({ onNavigateToCheckout, session, onSignOut }:
         onClose={() => setAuthModalVisible(false)}
         onSuccess={handleAuthSuccess}
       />
+
+      {/* Track Therapist Modal */}
+      {activeBooking && (
+        <TrackTherapistModal
+          visible={trackModalVisible}
+          onClose={() => setTrackModalVisible(false)}
+          booking={activeBooking}
+        />
+      )}
     </ScreenWrapper>
   );
 }

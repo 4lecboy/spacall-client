@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { COLORS, SIZES, FONTS, SHADOW } from '../constants/theme';
+import { COLORS, SIZES, FONTS, SHADOWS } from '../constants/theme';
 
 // Hardcoded services for the prototype
 const SERVICES = [
@@ -43,7 +43,7 @@ export default function ServiceModal({ visible, onClose, userId, location }: Ser
           location: { // We save the coordinates as a JSON object
             latitude: location.latitude,
             longitude: location.longitude,
-            address: "Current GPS Location" 
+            address: "Current GPS Location"
           }
         }
       ]);
@@ -89,12 +89,12 @@ export default function ServiceModal({ visible, onClose, userId, location }: Ser
               <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={[styles.bookButton, !selectedService && styles.disabledButton]} 
+            <TouchableOpacity
+              style={[styles.bookButton, !selectedService && styles.disabledButton]}
               onPress={handleBooking}
               disabled={loading || !selectedService}
             >
-              {loading ? <ActivityIndicator color="#fff"/> : <Text style={styles.bookText}>Book Now</Text>}
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.bookText}>Book Now</Text>}
             </TouchableOpacity>
           </View>
         </View>
@@ -115,10 +115,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: SIZES.padding,
     height: '55%',
-    ...SHADOW,
+    ...SHADOWS.medium,
   },
   title: {
-    ...FONTS.heading,
+    fontFamily: FONTS.heading,
+    fontSize: SIZES.h2,
+    fontWeight: '700',
+    color: COLORS.secondary,
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -137,21 +140,22 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
     backgroundColor: '#FAF6EE', // A very light gold tint
   },
-  serviceName: { 
-     fontSize: 16, 
-     fontWeight: '600', 
-     color: COLORS.textMain 
+  serviceName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.secondary
   },
-  serviceDuration: { 
-     ...FONTS.body, 
-     fontSize: 14 
+  serviceDuration: {
+    fontFamily: FONTS.body,
+    fontSize: 14,
+    color: COLORS.muted
   },
-  servicePrice: { 
-     fontSize: 18, 
-     fontWeight: 'bold', 
-     color: COLORS.primary // Gold price
+  servicePrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.primary // Gold price
   },
-  
+
   buttonRow: { flexDirection: 'row', marginTop: 20, gap: 10 },
   cancelButton: { flex: 1, padding: 15, alignItems: 'center' },
   cancelText: { color: 'red', fontWeight: 'bold' },

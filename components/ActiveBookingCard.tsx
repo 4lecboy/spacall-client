@@ -90,7 +90,7 @@ export default function ActiveBookingCard({ booking, onTrack, onHelp, onPress, m
             ₱{booking.total_price}
           </CustomText>
           <CustomText variant="body" color={COLORS.secondary} style={{ marginTop: 4, fontWeight: 'bold' }}>
-            View >
+            View →
           </CustomText>
         </View>
       </Wrapper>
